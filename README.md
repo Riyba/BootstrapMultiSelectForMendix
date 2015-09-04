@@ -27,4 +27,4 @@ Where you have a relatively small number of available options for a reference se
 - Items to display: The max number of items that will be displayed as a comma delimited string in the dropdown field before being replaced with the text 'n selected' (where n is the number of selected items).
 
 ## Events
-On change: The microflow that will be run when an item is checked or unchecked.
+- On change: The microflow that will be run when an item is checked or unchecked.
