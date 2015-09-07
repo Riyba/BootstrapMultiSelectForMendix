@@ -1,5 +1,5 @@
 /*
-    TagsInputForReferenceSet
+    BootstrapMultiSelectForMendix
     ========================
 
     @file      : BootstrapMultiSelect.js
@@ -18,14 +18,31 @@
 */
 
 define([
-    'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin', 'dijit/_AttachMixin',
-    'mxui/dom', 'dojo/dom', 'dojo/query', 'dojo/dom-prop', 'dojo/dom-class', 'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang', 'dojo/text', 'dojo/html', 'dojo/_base/event',     'BootstrapMultiSelectForMendix/widget/lib/jquery-1.11.2.min',
-    'BootstrapMultiSelectForMendix/widget/lib/bootstrap.min',
-    'BootstrapMultiSelectForMendix/widget/lib/bootstrap-multiselect.min', 'dojo/text!BootstrapMultiSelectForMendix/widget/templates/BootstrapMultiSelect.html'
-], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domClass, domStyle, domConstruct, dojoArray, lang, text, html, event, _jQuery, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
+    'dojo/_base/declare', 
+    'mxui/widget/_WidgetBase', 
+    'dijit/_TemplatedMixin', 
+    'dijit/_AttachMixin',
+    'mxui/dom', 
+    'dojo/dom', 
+    'dojo/query', 
+    'dojo/dom-prop', 
+    'dojo/dom-geometry', 
+    'dojo/dom-class', 
+    'dojo/dom-style', 
+    'dojo/dom-construct', 
+    'dojo/_base/array', 
+    'dojo/_base/lang', 
+    'dojo/text', 
+    'dojo/html', 
+    'dojo/_base/event',
+    'BootstrapMultiSelectForMendix/lib/jquery-1.11.2',
+    'BootstrapMultiSelectForMendix/lib/bootstrap',
+    'BootstrapMultiSelectForMendix/lib/bootstrap-multiselect',
+    'dojo/text!BootstrapMultiSelectForMendix/widget/templates/BootstrapMultiSelect.html'
+], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domGeom, domClass, domStyle, domConstruct, dojoArray, lang, text, html, event, _jQuery, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
     'use strict';
 
-    var $ = jQuery.noConflict(true);
+    var $ = _jQuery.noConflict(true);
     
     return declare('BootstrapMultiSelectForMendix.widget.BootstrapMultiSelect', [_WidgetBase, _TemplatedMixin], {
 
