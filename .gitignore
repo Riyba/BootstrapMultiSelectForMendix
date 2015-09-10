@@ -9,3 +9,4 @@ test/.project
 *.tmp
 *.lock
 .idea/
+test/package.xml

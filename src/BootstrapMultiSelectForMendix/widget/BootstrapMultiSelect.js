@@ -3,9 +3,9 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 1.0
+    @version   : 1.2
     @author    : Iain Lindsay
-    @date      : Wed, 02 Sep 2015 08:08:10 GMT
+    @date      : Thur, 10 Sep 2015 08:08:10 GMT
     @copyright : AuraQ Limited 2015
     @license   : Apache v2
 
@@ -84,8 +84,8 @@ define([
                     comboLabelWidth = this.labelWidth > 11 ? 11 : this.labelWidth;
                     
                     var comboControlWidth = 12 - comboLabelWidth,                    
-                        comboLabelClass = 'col-md-' + comboLabelWidth,
-                        comboControlClass = 'col-md-' + comboControlWidth;
+                        comboLabelClass = 'col-sm-' + comboLabelWidth,
+                        comboControlClass = 'col-sm-' + comboControlWidth;
                     
                     domClass.add(this.multiSelectLabel, comboLabelClass);
                     domClass.add(this.multiSelectComboContainer, comboControlClass);
