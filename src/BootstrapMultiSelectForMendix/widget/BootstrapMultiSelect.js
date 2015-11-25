@@ -135,7 +135,11 @@ require({
                     includeSelectAllOption: self.addSelectAll,
                     includeSelectAllDivider: self.addSelectAll,
                     buttonClass: 'form-control',
-                    dropRight: true,                    
+                    dropRight: true,                      
+                    selectAllText : this.selectAllText,                      
+                    nonSelectedText : this.noneSelectedText,                      
+                    allSelectedText : this.allSelectedText,                      
+                    nSelectedText : this.numberSelectedText,
                     onChange: function(option, checked, select) {
                         // in the absence of an 'onDeselectAll' event we assume
                         // its the selectall checkbox if the option value is undefined

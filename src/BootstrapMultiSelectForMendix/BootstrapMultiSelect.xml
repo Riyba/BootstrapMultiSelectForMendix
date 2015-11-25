@@ -66,5 +66,45 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lD
             <description>Run this microflow when an item is ticked or unticked</description>
             <returnType type="Void"/>
         </property>
+        <property key="selectAllText" type="translatableString">
+            <caption>Select All text</caption>
+            <category>Strings</category>
+            <description>The caption to display for the Select All checkbox</description>
+            <translations>
+                <translation lang="en_GB">Select All</translation>
+                <translation lang="en_US">Select All</translation>
+                <translation lang="nl_NL">Alles selecteren</translation>
+            </translations>
+        </property>
+        <property key="noneSelectedText" type="translatableString">
+            <caption>None Selected text</caption>
+            <category>Strings</category>
+            <description>The string to display when no option is selected</description>
+            <translations>
+                <translation lang="en_GB">None Selected</translation>
+                <translation lang="en_US">None Selected</translation>
+                <translation lang="nl_NL">Niets geselecteerd</translation>
+            </translations>
+        </property>
+        <property key="allSelectedText" type="translatableString">
+            <caption>All Selected text</caption>
+            <category>Strings</category>
+            <description>The string to display when all options are selected</description>
+            <translations>
+                <translation lang="en_GB">All Selected</translation>
+                <translation lang="en_US">All Selected</translation>
+                <translation lang="nl_NL">Alles geselecteerd</translation>
+            </translations>
+        </property>
+        <property key="numberSelectedText" type="translatableString">
+            <caption># Selected text</caption>
+            <category>Strings</category>
+            <description>The string to display when selected items exceeds the 'Items to display' property (Number will be prepended so ensure you leave a space!)</description>
+            <translations>
+                <translation lang="en_GB"> selected</translation>
+                <translation lang="en_US"> selected</translation>
+                <translation lang="nl_NL"> geselecteerd</translation>
+            </translations>
+        </property>
 	</properties>
 </widget>
