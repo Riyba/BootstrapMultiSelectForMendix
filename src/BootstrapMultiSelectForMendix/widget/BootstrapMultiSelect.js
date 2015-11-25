@@ -215,7 +215,7 @@ require({
             
             dojoArray.forEach(objs, function (availableObject, index) {
                 
-                var optionLabel = dom.escapeString(availableObject.get(self._labelAttribute)),
+                var optionLabel = availableObject.get(self._labelAttribute),
                     optionValue = availableObject.getGuid(),
                     item = {
                         label: optionLabel, value: optionValue, selected: false
