@@ -3,9 +3,9 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 1.3
+    @version   : 1.5
     @author    : Iain Lindsay
-    @date      : Thur, 24 Sep 2015 19:42:00 GMT
+    @date      : Mon, 30 Nov 2015 11:57:00 GMT
     @copyright : AuraQ Limited 2015
     @license   : Apache v2
 
@@ -76,6 +76,7 @@ require({
         _$alertdiv: null,
         _$combo: null,
         _comboData : [],
+        _sortParams : [],
 
         constructor: function () {
             this._handles = [];
@@ -86,6 +87,12 @@ require({
             this._entity = this.dataAssociation.split('/')[1];
             this._reference = this.dataAssociation.split('/')[0];
             this._labelAttribute = this.labelAttribute.split('/')[2];
+            
+            // create our sort order array
+            for(var i=0;i<this.sortContainer.length;i++) {
+                var item = this.sortContainer[i];
+                this._sortParams.push([item.sortAttribute, item.sortOrder]);
+            }
             
             // make sure we only select the control for the current id or we'll overwrite previous instances
             var selector = '#' + this.id + ' select.multiSelect';
@@ -204,7 +211,7 @@ require({
             mx.data.get({
                 xpath: xpath,
                 filter: {
-                    sort: [[this._labelAttribute, "asc"]],
+                    sort: this._sortParams,
                     offset: 0
                 },
                 callback: lang.hitch(this, this._processComboData)
