@@ -3,10 +3,10 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 1.5
+    @version   : 1.6
     @author    : Iain Lindsay
-    @date      : Mon, 30 Nov 2015 11:57:00 GMT
-    @copyright : AuraQ Limited 2015
+    @date      : Thu, 07 Jan 2016 16:06:00 GMT
+    @copyright : AuraQ Limited 2016
     @license   : Apache v2
 
     Documentation
@@ -87,7 +87,9 @@ require({
             this._entity = this.dataAssociation.split('/')[1];
             this._reference = this.dataAssociation.split('/')[0];
             this._labelAttribute = this.labelAttribute.split('/')[2];
-            
+                        
+            // issues with the sort parameters being persisted between widget instances mean we set the sort array to empty.
+            this._sortParams = [];
             // create our sort order array
             for(var i=0;i<this.sortContainer.length;i++) {
                 var item = this.sortContainer[i];
@@ -199,7 +201,10 @@ require({
 
         resize: function (box) {},
 
-        uninitialize: function () {},
+        uninitialize: function () {
+            this._comboData = [];
+            this._sortParams = [];
+        },
         
         // retrieves the data from the child entity, applying the required constraint
         _loadComboData: function () {
