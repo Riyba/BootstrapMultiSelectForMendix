@@ -5,7 +5,7 @@
     @file      : BootstrapMultiSelect.js
     @version   : 1.6
     @author    : Iain Lindsay
-    @date      : Thu, 07 Jan 2016 16:06:00 GMT
+    @date      : Thu, 27 Jan 2016 10:53:00 GMT
     @copyright : AuraQ Limited 2016
     @license   : Apache v2
 
@@ -267,9 +267,11 @@ require({
         _execMf: function (guid, mf, cb) {
             if (guid && mf) {
                 mx.data.action({
-                    applyto: 'selection',
-                    actionname: mf,
-                    guids: [guid],
+                    params: {
+                        applyto: 'selection',
+                        actionname: mf,
+                        guids: [guid]
+                    },
                     callback: function () {
                         if (cb) {
                             cb();
