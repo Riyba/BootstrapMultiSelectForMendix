@@ -5,7 +5,7 @@
     @file      : BootstrapMultiSelect.js
     @version   : 1.6
     @author    : Iain Lindsay
-    @date      : Thu, 27 Jan 2016 10:53:00 GMT
+    @date      : Mon, 22 Feb 2016 10:53:00 GMT
     @copyright : AuraQ Limited 2016
     @license   : Apache v2
 
@@ -293,7 +293,9 @@ require({
 
             if (this._handles) {
                 dojoArray.forEach(this._handles, function (handle) {
-                    this.unsubscribe(handle);
+                    if( this ) {
+                        this.unsubscribe(handle);
+                    }
                 });
                 this._handles = [];
             }
