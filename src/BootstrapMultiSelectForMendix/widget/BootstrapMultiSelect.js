@@ -3,9 +3,9 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 1.6
+    @version   : 1.6.1
     @author    : Iain Lindsay
-    @date      : Mon, 22 Feb 2016 10:53:00 GMT
+    @date      : 2017-01-12
     @copyright : AuraQ Limited 2016
     @license   : Apache v2
 
@@ -16,21 +16,7 @@
     
     Available options are held in a separate entity, selected items are stored in a reference set association to that entity.
 */
-require({
-    packages: [{
-         name: 'jqwrapper',
-         location: '../../widgets/BootstrapMultiSelectForMendix/lib',
-         main: 'jqwrapper'
-    }, {
-         name: 'bootstrap',
-         location: '../../widgets/BootstrapMultiSelectForMendix/lib',
-         main: 'bootstrap'
-    }, {
-         name: 'bootstrap-multiselect',
-         location: '../../widgets/BootstrapMultiSelectForMendix/lib',
-         main: 'bootstrap-multiselect'
-    }]
-    }, [
+define( [
     'dojo/_base/declare', 
     'mxui/widget/_WidgetBase', 
     'dijit/_TemplatedMixin', 
@@ -48,14 +34,14 @@ require({
     'dojo/text', 
     'dojo/html', 
     'dojo/_base/event',
-    'jqwrapper',
-    'bootstrap',
-    'bootstrap-multiselect',
+    'BootstrapMultiSelectForMendix/lib/jquery-1.11.2',
+    'BootstrapMultiSelectForMendix/lib/bootstrap',
+    'BootstrapMultiSelectForMendix/lib/bootstrap-multiselect',
     'dojo/text!BootstrapMultiSelectForMendix/widget/templates/BootstrapMultiSelect.html'
-], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domGeom, domClass, domStyle, domConstruct, dojoArray, lang, text, html, event, _jqwrapper, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
+], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domGeom, domClass, domStyle, domConstruct, dojoArray, lang, text, html, event, _jQuery, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
     'use strict';
 
-    var $ = _jqwrapper;
+    var $ = _jQuery.noConflict(true);
     $ = _bootstrap.createInstance($);
     $ = _bootstrapMultiSelect.createInstance($);
     

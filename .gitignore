@@ -1,6 +1,7 @@
 test/javasource/
 test/deployment/
-test/resources/
+test/.classpath
+test/.project
 test/theme/
 test/userlib/
 test/.classpath
@@ -9,4 +10,11 @@ test/.project
 *.tmp
 *.lock
 .idea/
-test/package.xml
+
+dist/
+
+node_modules/
+.editorconfig
+*DS_Store*
+.vscode/
+*.bak
