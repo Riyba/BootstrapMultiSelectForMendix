@@ -3,7 +3,7 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 1.6.1
+    @version   : 1.6.0
     @author    : Iain Lindsay
     @date      : 2017-01-12
     @copyright : AuraQ Limited 2016
