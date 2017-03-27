@@ -169,7 +169,7 @@ define( [
                         
                         // run the OC microflow if one has been configured.                   
                         if( self.onChangeMicroflow ) {
-                            self._execMf(self._contextObj.getGuid(), self.onChangeMicroflow);
+                            self._execMf(self._contextObj.getGuid(), self.onChangeMicroflow, null, self.onChangeMicroflowShowProgress, self.onChangeMicroflowProgressMessage);
                         }
                     }
                 });                            
@@ -255,9 +255,10 @@ define( [
             self._$combo.multiselect('dataprovider', this._comboData);                
         },
 
-        _execMf: function (guid, mf, cb) {
+        _execMf: function (guid, mf, cb, showProgress, message) {
             if (guid && mf) {
-                mx.data.action({
+                
+                var options = {
                     params: {
                         applyto: 'selection',
                         actionname: mf,
@@ -271,9 +272,15 @@ define( [
                     error: function (e) {
                         logger.error('Error running Microflow: ' + e);
                     }
-                }, this);
-            }
+                }
 
+                if(showProgress){                    
+                    options.progress = "modal";
+                    options.progressMsg = message;
+                }
+
+                mx.ui.action(mf,options, this);
+            }
         },
 
         _resetSubscriptions: function () {

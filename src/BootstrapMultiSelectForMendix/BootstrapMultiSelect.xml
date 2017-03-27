@@ -108,6 +108,16 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lD
             <description>Run this microflow when an item is ticked or unticked</description>
             <returnType type="Void"/>
         </property>
+        <property key="onChangeMicroflowShowProgress" type="boolean" defaultValue="true">
+            <caption>Show Progress Bar</caption>
+            <category>Events</category>
+            <description>Controls whether a progress bar should be displayed when executing the onchange microflow</description>
+        </property>
+        <property key="onChangeMicroflowProgressMessage" type="string" required="false">
+            <caption>Progress Message</caption>
+            <category>Events</category>
+            <description>The progress message to show when executing the onchange microflow</description>
+        </property>
         <property key="selectAllText" type="translatableString">
             <caption>Select All text</caption>
             <category>Strings</category>
