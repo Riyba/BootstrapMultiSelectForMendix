@@ -4,9 +4,9 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 1.7.0
+    @version   : 2.0.0
     @author    : Iain Lindsay
-    @date      : 2017-01-12
+    @date      : 2017-03-27
     @copyright : AuraQ Limited 2016
     @license   : Apache v2
 
@@ -35,11 +35,12 @@ define( [
     'dojo/text', 
     'dojo/html', 
     'dojo/_base/event',
+    "dojo/_base/kernel",
     'BootstrapMultiSelectForMendix/lib/jquery-1.11.2',
     'BootstrapMultiSelectForMendix/lib/bootstrap',
     'BootstrapMultiSelectForMendix/lib/bootstrap-multiselect',
     'dojo/text!BootstrapMultiSelectForMendix/widget/templates/BootstrapMultiSelect.html'
-], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domGeom, domClass, domStyle, domConstruct, dojoArray, lang, text, html, event, _jQuery, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
+], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domGeom, domClass, domStyle, domConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, dojo, _jQuery, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
     'use strict';
 
     var $ = _jQuery.noConflict(true);
@@ -55,8 +56,7 @@ define( [
         fieldCaption: "",
         formOrientation: "",
 
-        _entity: null,      
-        _labelAttribute: null,  
+        _entity: null,  
         _reference: null,
         _handles: null,
         _contextObj: null,
@@ -64,6 +64,8 @@ define( [
         _$combo: null,
         _comboData : [],
         _sortParams : [],
+        variableData : [],
+        _attributeList: null,
 
         constructor: function () {
             this._handles = [];
@@ -72,9 +74,9 @@ define( [
         postCreate: function (obj) {
 
             this._entity = this.dataAssociation.split('/')[1];
-            this._reference = this.dataAssociation.split('/')[0];
-            this._labelAttribute = this.labelAttribute.split('/')[2];
-                        
+            this._reference = this.dataAssociation.split('/')[0];        
+            this._attributeList = this._variableContainer;
+
             // issues with the sort parameters being persisted between widget instances mean we set the sort array to empty.
             this._sortParams = [];
             // create our sort order array
@@ -210,7 +212,7 @@ define( [
                     sort: this._sortParams,
                     offset: 0
                 },
-                callback: lang.hitch(this, this._processComboData)
+                callback: dojoLang.hitch(this, this._processComboData)
             });
         },
         
@@ -218,27 +220,212 @@ define( [
         _processComboData: function (objs) {
             var self = this;
             // reset our data
-            self._comboData = [];            
+            this._comboData = []; 
+            this.variableData = []; // this will hold our variables
+            var referenceAttributes = [];           
             
             dojoArray.forEach(objs, function (availableObject, index) {
-                
-                var optionLabel = availableObject.get(self._labelAttribute),
-                    optionValue = availableObject.getGuid(),
+                var currentVariable = {};
+                currentVariable.guid = availableObject.getGuid();
+                currentVariable.variables = [];
+
+                for (var i = 0; i < self._attributeList.length; i++) {
+                    if (availableObject.get(self._attributeList[i].variableAttribute) !== null) {
+                        var value = self._fetchAttribute(availableObject, self._attributeList[i].variableAttribute, i);
+
+                        currentVariable.variables.push({
+                            id: i,
+                            variable: self._attributeList[i].variableName,
+                            value: value
+                        });                                                                        
+                    } else {
+                        // add a placeholder for our reference variable value.
+                        currentVariable.variables.push({
+                            id: i,
+                            variable: self._attributeList[i].variableName,
+                            value: "" // set this later
+                        });
+
+                        var split = self._attributeList[i].variableAttribute.split("/");
+                        var refAttribute = {};
+                        for(var a in self._attributeList[i]) refAttribute[a]=self._attributeList[i][a];
+                        refAttribute.attributeIndex = i;
+                        refAttribute.parentGuid = availableObject.getGuid();
+                        refAttribute.referenceGuid = availableObject.getReference(split[0]);
+                        refAttribute.referenceAttribute = split[2];
+
+                        referenceAttributes.push(refAttribute);
+                    }
+                }
+
+                self.variableData.push(currentVariable);           
+
+            });
+
+             if( referenceAttributes.length > 0 ){
+                // get values for our references
+                this._fetchReferences(referenceAttributes, this._formatResults);                
+            } else{
+                // format the results
+                dojoLang.hitch(this, this._formatResults)();
+            }        
+        },
+
+        _fetchAttribute: function (obj, attr, i, escapeValues) {
+            logger.debug(this.id + "._fetchAttribute");
+            var returnvalue = "",
+                options = {},
+                numberOptions = null;
+
+            // Referenced object might be empty, can't fetch an attr on empty
+            if (!obj) {
+                return "";
+            }
+
+            if (obj.isDate(attr)) {
+                if (this._attributeList[i].datePattern !== "") {
+                    options.datePattern = this._attributeList[i].datePattern;
+                }
+                if (this._attributeList[i].timePattern !== "") {
+                    options.timePattern = this._attributeList[i].timePattern;
+                }
+                returnvalue = this._parseDate(this._attributeList[i].datetimeformat, options, obj.get(attr));
+            } else if (obj.isEnum(attr)) {
+                returnvalue = this._checkString(obj.getEnumCaption(attr, obj.get(attr)), escapeValues);
+            }  else if (obj.isNumeric(attr) || obj.isCurrency(attr) || obj.getAttributeType(attr) === "AutoNumber") {
+                numberOptions = {};
+                numberOptions.places = this._attributeList[i].decimalPrecision;
+                if (this._attributeList[i].groupDigits) {
+                    numberOptions.locale = dojo.locale;
+                    numberOptions.groups = true; 
+                }
+
+                returnvalue = mx.parser.formatValue(obj.get(attr), obj.getAttributeType(attr), numberOptions);
+            } else {
+                if (obj.getAttributeType(attr) === "String") {
+                    returnvalue = this._checkString(mx.parser.formatAttribute(obj, attr), escapeValues);
+                }
+            }
+
+            if (returnvalue === "") {
+                return "";
+            } else {
+                return returnvalue;
+            }
+        },
+
+        _fetchReferences: function (referenceAttributes, formatResultsFunction, callback) {
+            logger.debug(this.id + "._fetchReferences");
+            var self = this;
+            var l = referenceAttributes.length;
+
+            var callbackfunction = function (data, obj) {
+                logger.debug(this.id + "._fetchReferences get callback");
+                var value = this._fetchAttribute(obj, data.referenceAttribute, data.attributeIndex);
+
+                var result = $.grep(this.variableData, function(e){ 
+                    return e.guid == data.parentGuid; 
+                });
+
+                if( result && result[0] ){
+                    var resultVariable = $.grep(result[0].variables, function(e){ return e.id == data.attributeIndex; });
+                    if( resultVariable && resultVariable[0]){
+                        resultVariable[0].value = value;
+                    }
+                }
+
+                l--;
+                if (l <= 0) {
+                    // format our results
+                    dojoLang.hitch(this, formatResultsFunction, callback)();
+                }
+            };
+
+            for (var i = 0; i < referenceAttributes.length; i++) {
+                var listObj = referenceAttributes[i],
+                    split = referenceAttributes[i].variableAttribute.split("/"),
+                    guid = referenceAttributes[i].referenceGuid,
+                    attributeIndex = referenceAttributes[i].attributeIndex,
+                    parentGuid = referenceAttributes[i].parentGuid,
+                    referenceAttribute = referenceAttributes[i].referenceAttribute,
+                    dataparam = {
+                        i: i,
+                        listObj: listObj,
+                        attributeIndex: attributeIndex,
+                        parentGuid : parentGuid,
+                        referenceAttribute : referenceAttribute
+                    };
+
+
+                if (guid !== "") {
+                    mx.data.get({
+                        guid: guid,
+                        callback: dojoLang.hitch(this, callbackfunction, dataparam)
+                    });
+                }
+            }
+        },
+
+        _formatResults : function(){
+            // an array that will be populated with our results
+            var display = "";
+
+            for(var i = 0;i< this.variableData.length; i++){
+                display = this._mergeTemplate(this.variableData[i].variables, this.displayTemplate, true);
+
+                var optionLabel = display,
+                    optionValue = this.variableData[i].guid,
                     item = {
                         label: optionLabel, value: optionValue, selected: false
                     };    
                 
-                self._comboData.push(item);
-            });
-            
-            // load and set the current associated data
-            self._setReferencedObjects();            
+                this._comboData.push(item);
+            }
+
+            this._setReferencedObjects();
+        },
+
+        _checkString: function (str, escapeValues) {
+            logger.debug(this.id + "._checkString");
+            if (str.indexOf("<script") > -1 || escapeValues) {
+                str = dom.escapeString(str);
+            }
+            return str;
+        },
+
+        _parseDate: function (format, options, value) {
+            logger.debug(this.id + "._parseDate");
+            var datevalue = value;
+
+            if (value === "") {
+                return value;
+            }
+
+            options.selector = format;
+            datevalue = dojo.date.locale.format(new Date(value), options);
+
+            return datevalue;
+        },
+
+        _mergeTemplate : function(variables, template, escapeTemplate) {
+            var self = this;
+
+            if( escapeTemplate ){
+                template = dom.escapeString(template);
+            }
+
+            for (var attr in variables) {
+                var settings = variables[attr];
+                template = template.split("${" + settings.variable + "}").join(settings.value);
+            }
+
+            return template;
         },
 
         // marks referenced objects as selected in the combo options.
         _setReferencedObjects: function () {           
             var self = this,
-                referencedObjects = this._contextObj.get(this._reference);
+                referencedObjects = self._contextObj.get(self._reference);
             
             if(referencedObjects !== null && referencedObjects !== "") {
                 dojoArray.forEach(self._comboData, function (availableObject, index) {                
@@ -247,8 +434,8 @@ define( [
                         if (availableObject.value === ref) {
                                 availableObject.selected = true;
                         }
-                    }, this);
-                }, this);
+                    }, self);
+                }, self);
             }
             
             // update array and set selected flag based on referenced options                
@@ -304,7 +491,7 @@ define( [
                     callback: function (guid) {
                         mx.data.get({
                             guid: guid,
-                            callback: lang.hitch(this, function (obj) {
+                            callback: dojoLang.hitch(this, function (obj) {
                                 this._contextObj = obj;
                                 this._loadComboData();
                             })
@@ -315,10 +502,10 @@ define( [
                 attrHandle = mx.data.subscribe({
                     guid: this._contextObj.getGuid(),
                     attr: this._reference,
-                    callback: lang.hitch(this, function (guid) {
+                    callback: dojoLang.hitch(this, function (guid) {
                         mx.data.get({
                             guid: guid,
-                            callback: lang.hitch(this, function (obj) {
+                            callback: dojoLang.hitch(this, function (obj) {
                                 this._contextObj = obj;
                                 this._loadComboData();
                             })
@@ -330,7 +517,7 @@ define( [
                 validationHandle = mx.data.subscribe({
                     guid: this._contextObj.getGuid(),
                     val: true,
-                    callback: lang.hitch(this, this._handleValidation)
+                    callback: dojoLang.hitch(this, this._handleValidation)
                 });
 
                 this._handles.push(handle);
