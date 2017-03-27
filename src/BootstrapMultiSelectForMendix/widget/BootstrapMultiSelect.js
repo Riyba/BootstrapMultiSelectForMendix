@@ -1,9 +1,10 @@
+/*global logger*/
 /*
     BootstrapMultiSelectForMendix
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 1.6.0
+    @version   : 1.6.1
     @author    : Iain Lindsay
     @date      : 2017-01-12
     @copyright : AuraQ Limited 2016
@@ -193,7 +194,9 @@ define( [
         },
         
         // retrieves the data from the child entity, applying the required constraint
-        _loadComboData: function () {
+        _loadComboData: function () {            
+            // Important to clear all validations!
+            this._clearValidations();
             
             // reset our data
             this._comboData = [];
@@ -264,7 +267,7 @@ define( [
                         }
                     },
                     error: function (e) {
-                        console.error('Error running Microflow: ' + e);
+                        logger.error('Error running Microflow: ' + e);
                     }
                 }, this);
             }
@@ -302,7 +305,7 @@ define( [
                 });
                 attrHandle = mx.data.subscribe({
                     guid: this._contextObj.getGuid(),
-                    attr: this.attribute,
+                    attr: this._reference,
                     callback: lang.hitch(this, function (guid) {
                         mx.data.get({
                             guid: guid,
@@ -328,20 +331,21 @@ define( [
         },
         
         _handleValidation: function (validations) {
-
+            logger.debug(this.id + "._handleValidation");
             this._clearValidations();
 
-            var val = validations[0],
-                msg = val.getReasonByAttribute(this._reference);
+            var validation = validations[0],
+                message = validation.getReasonByAttribute(this._reference);
 
             if (this.readOnly) {
-                val.removeAttribute(this._reference);
+                validation.removeAttribute(this._reference);
             } else {
-                if (msg) {
-                    this._addValidation(msg);
-                    val.removeAttribute(this._reference);
+                if (message) {
+                    this._addValidation(message);
+
+                    validation.removeAttribute(this._reference);                    
                 }
-            }
+            }            
         },
 
         _clearValidations: function () {
