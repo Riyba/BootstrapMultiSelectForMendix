@@ -87,6 +87,16 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lD
             <category>Display</category>
             <description>Add a 'Select All' checkbox at the top of the option list</description>
         </property>
+        <property key="addFilter" type="boolean" defaultValue="false">
+            <caption>Add Filter</caption>
+            <category>Display</category>
+            <description>Add a filter at the top of the option list</description>
+        </property>
+        <property key="caseSensitiveFilter" type="boolean" defaultValue="true">
+            <caption>Case Sensitive Filter</caption>
+            <category>Display</category>
+            <description>If the filter is enabled, whether the search is case sensitive or not</description>
+        </property>
         <property key="itemsToDisplay" type="integer" defaultValue="4">
             <caption>Items to display</caption>
             <category>Display</category>

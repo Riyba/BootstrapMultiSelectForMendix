@@ -4,7 +4,7 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 1.6.1
+    @version   : 1.7.0
     @author    : Iain Lindsay
     @date      : 2017-01-12
     @copyright : AuraQ Limited 2016
@@ -136,6 +136,8 @@ define( [
                     nonSelectedText : this.noneSelectedText,                      
                     allSelectedText : this.allSelectedText,                      
                     nSelectedText : this.numberSelectedText,
+                    enableFiltering : this.addFilter,
+                    enableCaseInsensitiveFiltering : !this.caseSensitiveFilter,
                     onChange: function(option, checked, select) {
                         // in the absence of an 'onDeselectAll' event we assume
                         // its the selectall checkbox if the option value is undefined
