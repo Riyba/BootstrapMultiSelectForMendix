@@ -1,4 +1,4 @@
-# Bootstrap Multi Select for Mendix - Versiuon 2
+# Bootstrap Multi Select for Mendix - Version 2
 
 This widget is a wrapper for the [Bootstrap MultiSelect plugin](https://github.com/davidstutz/bootstrap-multiselect)  allowing you to use a dropdown of checkboxes for your reference set.
 
