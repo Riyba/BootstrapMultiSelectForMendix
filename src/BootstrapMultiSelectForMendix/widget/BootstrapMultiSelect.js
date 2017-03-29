@@ -6,7 +6,7 @@
     @file      : BootstrapMultiSelect.js
     @version   : 2.0.0
     @author    : Iain Lindsay
-    @date      : 2017-03-27
+    @date      : 2017-03-29
     @copyright : AuraQ Limited 2016
     @license   : Apache v2
 
@@ -40,7 +40,7 @@ define( [
     'BootstrapMultiSelectForMendix/lib/bootstrap',
     'BootstrapMultiSelectForMendix/lib/bootstrap-multiselect',
     'dojo/text!BootstrapMultiSelectForMendix/widget/templates/BootstrapMultiSelect.html'
-], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domGeom, domClass, domStyle, domConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, dojo, _jQuery, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
+], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domGeom, dojoClass, domStyle, domConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, dojo, _jQuery, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
     'use strict';
 
     var $ = _jQuery.noConflict(true);
@@ -71,7 +71,7 @@ define( [
             this._handles = [];
         },        
 
-        postCreate: function (obj) {
+        postCreate: function () {
 
             this._entity = this.dataAssociation.split('/')[1];
             this._reference = this.dataAssociation.split('/')[0];        
@@ -100,14 +100,14 @@ define( [
                         comboLabelClass = 'col-sm-' + comboLabelWidth,
                         comboControlClass = 'col-sm-' + comboControlWidth;
                     
-                    domClass.add(this.multiSelectLabel, comboLabelClass);
-                    domClass.add(this.multiSelectComboContainer, comboControlClass);
+                    dojoClass.add(this.multiSelectLabel, comboLabelClass);
+                    dojoClass.add(this.multiSelectComboContainer, comboControlClass);
                 }
 
                 this.multiSelectLabel.innerHTML = this.fieldCaption;
             }
             else {
-                domClass.remove(this.multiSelectMainContainer, "form-group");
+                dojoClass.remove(this.multiSelectMainContainer, "form-group");
                 domConstruct.destroy(this.multiSelectLabel);
             }
         },
@@ -117,12 +117,12 @@ define( [
             var self = this;
             
             if (obj === null) {
-                if (!domClass.contains(this.domNode, 'hidden')) {
-                    domClass.add(this.domNode, 'hidden');
+                if (!dojoClass.contains(this.domNode, 'hidden')) {
+                    dojoClass.add(this.domNode, 'hidden');
                 }
             } else {
-                if (domClass.contains(this.domNode, 'hidden')) {
-                    domClass.remove(this.domNode, 'hidden');
+                if (dojoClass.contains(this.domNode, 'hidden')) {
+                    dojoClass.remove(this.domNode, 'hidden');
                 }
                 this._contextObj = obj;
                 this._resetSubscriptions();
@@ -174,7 +174,7 @@ define( [
                             self._execMf(self._contextObj.getGuid(), self.onChangeMicroflow, null, self.onChangeMicroflowShowProgress, self.onChangeMicroflowProgressMessage);
                         }
                     }
-                });                            
+                });                                       
                 
                 // load the available options and ticks the already associated options.
                 this._loadComboData();
@@ -195,6 +195,48 @@ define( [
         uninitialize: function () {
             this._comboData = [];
             this._sortParams = [];
+        },
+
+        _updateControlDisplay : function(){
+            // fixed property gets checked first
+            if(this.disabled){
+                this._$combo.multiselect('disable');
+                
+            } else{
+                this._$combo.multiselect('enable');
+            }
+            // attribute property beats fixed property    
+            if(this.disabledViaAttribute){
+                if(this._contextObj.get(this.disabledViaAttribute) ){
+                    this._$combo.multiselect('disable');
+                } else{
+                    this._$combo.multiselect('enable');
+                }
+            } 
+
+            // fixed property gets checked first
+            if(this.visible){
+                if (dojoClass.contains(this.domNode, 'hidden')) {
+                    dojoClass.remove(this.domNode, 'hidden');
+                }
+            } else {
+                if (!dojoClass.contains(this.domNode, 'hidden')) {
+                    dojoClass.add(this.domNode, 'hidden');
+                }
+            }
+
+            // attribute property beats fixed property
+            if(this.visibleViaAttribute ){
+                if(this._contextObj.get(this.visibleViaAttribute)){
+                    if (dojoClass.contains(this.domNode, 'hidden')) {
+                        dojoClass.remove(this.domNode, 'hidden');
+                    } 
+                } else {
+                    if (!dojoClass.contains(this.domNode, 'hidden')) {
+                        dojoClass.add(this.domNode, 'hidden');
+                    }
+                }
+            }     
         },
         
         // retrieves the data from the child entity, applying the required constraint
@@ -440,6 +482,9 @@ define( [
             
             // update array and set selected flag based on referenced options                
             self._$combo.multiselect('dataprovider', this._comboData);                
+
+            // finally update the display
+            self._updateControlDisplay();
         },
 
         _execMf: function (guid, mf, cb, showProgress, message) {

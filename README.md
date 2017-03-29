@@ -28,6 +28,10 @@ Where you have a relatively small number of available options for a reference se
 - **Add Filter**: Whether the dropdown should be rendered with a search bar at the top, allowing you to filter the results.
 - **Case Sensitive Filter**: If filter is enabled, whether the search is case sensitive or not.
 - **Items to display**: The max number of items that will be displayed as a comma delimited string in the dropdown field before being replaced with the text 'n selected' (where n is the number of selected items).
+- **Disabled**: Whether to render the control in a disabled state or not.
+- **Disabled via attribute**: An optional parameter. If populated will use the selected boolean attribute to render the control in a disabled state or not (true = disabled). This property overrides the 'Disabled' parameter.
+- **Visible**: Whether to render the control visible or not.
+- **Visible via attribute**: An optional parameter. If populated will use the selected boolean attribute to render the control visible or not (true = visible). This property overrides the 'Visible' parameter.
 
 ## Events
 - **On change**: The microflow that will be run when an item is checked or unchecked.

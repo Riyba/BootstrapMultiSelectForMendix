@@ -157,6 +157,32 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lD
             <category>Display</category>
             <description>The maximum number of selected items to display in the field before being replaced with the text 'n selected'</description>
         </property>
+        <property key="disabled" type="boolean" defaultValue="false">
+            <caption>Disabled</caption>
+            <category>Display</category>
+            <description>If true, makes the control disabled.</description>
+        </property>
+        <property key="disabledViaAttribute" type="attribute" required="false">
+            <caption>Disabled via attribute</caption>
+            <category>Display</category>
+            <description>Optional, set's control disabled property based on attribute (true = disabled, false = enabled)</description>
+            <attributeTypes>
+                <attributeType name="Boolean"/>
+            </attributeTypes>
+        </property>
+        <property key="visible" type="boolean" defaultValue="true">
+            <caption>Visible</caption>
+            <category>Display</category>
+            <description>If true, makes the control visible.</description>
+        </property>
+        <property key="visibleViaAttribute" type="attribute" required="false">
+            <caption>Visible via attribute</caption>
+            <category>Display</category>
+            <description>Optional, set's control visibility property based on attribute (true = visible, false = hidden)</description>
+            <attributeTypes>
+                <attributeType name="Boolean"/>
+            </attributeTypes>
+        </property>
         <property key="onChangeMicroflow" type="microflow" required="false">
             <caption>On change</caption>
             <category>Events</category>
