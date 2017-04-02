@@ -65,7 +65,8 @@ define( [
         _comboData : [],
         _sortParams : [],
         variableData : [],
-        _attributeList: null,
+        _attributeList: null, 
+        _bypassDataRefresh : null,
 
         constructor: function () {
             this._handles = [];
@@ -141,22 +142,46 @@ define( [
                     enableFiltering : this.addFilter,
                     enableCaseInsensitiveFiltering : !this.caseSensitiveFilter,
                     onChange: function(option, checked, select) {
+                        // we don't want changes here to re-load the data when the attribute subscription kicks in
+                        self._bypassDataRefresh = true;  
                         // in the absence of an 'onDeselectAll' event we assume
-                        // its the selectall checkbox if the option value is undefined
+                        // its the selectall checkbox if the option value is undefined                                      
                         if( option === undefined ) {
+                            var my$ = $;                                                        
                             if (checked){
-                                dojoArray.forEach(self._comboData, function (availableObject, index) {                
-                                    var guid = availableObject.value;
+                                // if there is a filter we need to pull back only the visible options, otherwise we'll update all items
+                                if(self.addFilter){
+                                    var visibleOptions = self._getVisibleOptions();
+                                    dojoArray.forEach(visibleOptions, function (availableObject, index) {                
+                                        var guid = availableObject.value;
 
-                                    self._contextObj.addReference(self._reference, guid);
-                                });
+                                        self._contextObj.addReference(self._reference, guid);
+                                    });
+
+                                } else{
+                                    dojoArray.forEach(self._comboData, function (availableObject, index) {                
+                                        var guid = availableObject.value;
+
+                                        self._contextObj.addReference(self._reference, guid);
+                                    });
+                                }                                
                             }
                             else{
-                               dojoArray.forEach(self._comboData, function (availableObject, index) {                
-                                    var guid = availableObject.value;
+                               // if there is a filter we need to pull back only the visible options, otherwise we'll update all items
+                                if(self.addFilter){
+                                    var visibleOptions = self._getVisibleOptions();
+                                    dojoArray.forEach(visibleOptions, function (availableObject, index) {                
+                                        var guid = availableObject.value;
 
-                                    self._contextObj.removeReferences(self._reference, [guid]);
-                                });
+                                        self._contextObj.removeReferences(self._reference, [guid]);
+                                    });
+                                } else{
+                                    dojoArray.forEach(self._comboData, function (availableObject, index) {                
+                                        var guid = availableObject.value;
+
+                                        self._contextObj.removeReferences(self._reference, [guid]);
+                                    });
+                                }
                             }                            
                         }
                         else {
@@ -168,13 +193,15 @@ define( [
                                 self._contextObj.removeReferences(self._reference, [guid]);
                             }
                         }
+
+                        self._bypassDataRefresh = false;
                         
                         // run the OC microflow if one has been configured.                   
                         if( self.onChangeMicroflow ) {
                             self._execMf(self._contextObj.getGuid(), self.onChangeMicroflow, null, self.onChangeMicroflowShowProgress, self.onChangeMicroflowProgressMessage);
                         }
                     }
-                });                                       
+                });                                     
                 
                 // load the available options and ticks the already associated options.
                 this._loadComboData();
@@ -195,6 +222,22 @@ define( [
         uninitialize: function () {
             this._comboData = [];
             this._sortParams = [];
+        },
+
+        _getVisibleOptions:function(){
+            var options = [];
+            var selector = "#" + this.id + " .btn-group li:not(.multiselect-item):not(.filter-hidden)";
+            $.each($(selector), function(index, element) {
+                var value = $('input', element).length > 0 ? $('input', element).val() : "";
+                var text = $('label', element).text();
+                var newOption = {};
+                newOption.value = value;
+                newOption.text = text;
+
+                options.push(newOption);
+            });
+
+            return options;
         },
 
         _updateControlDisplay : function(){
@@ -236,7 +279,7 @@ define( [
                         dojoClass.add(this.domNode, 'hidden');
                     }
                 }
-            }     
+            } 
         },
         
         // retrieves the data from the child entity, applying the required constraint
@@ -245,8 +288,6 @@ define( [
             this._clearValidations();
             
             // reset our data
-            this._comboData = [];
-            
             var xpath = '//' + this._entity + this.dataConstraint.replace('[%CurrentObject%]', this._contextObj.getGuid());
             mx.data.get({
                 xpath: xpath,
@@ -471,6 +512,8 @@ define( [
             
             if(referencedObjects !== null && referencedObjects !== "") {
                 dojoArray.forEach(self._comboData, function (availableObject, index) {                
+                    // reset to false first
+                    availableObject.selected = false;
                     //check if this is a current tag
                     dojoArray.forEach(referencedObjects, function (ref, i) {
                         if (availableObject.value === ref) {
@@ -478,18 +521,17 @@ define( [
                         }
                     }, self);
                 }, self);
-            }
+            }                    
             
             // update array and set selected flag based on referenced options                
-            self._$combo.multiselect('dataprovider', this._comboData);                
+            self._$combo.multiselect('dataprovider', this._comboData);
 
             // finally update the display
             self._updateControlDisplay();
         },
 
         _execMf: function (guid, mf, cb, showProgress, message) {
-            if (guid && mf) {
-                
+            if (guid && mf) {                
                 var options = {
                     params: {
                         applyto: 'selection',
@@ -538,7 +580,9 @@ define( [
                             guid: guid,
                             callback: dojoLang.hitch(this, function (obj) {
                                 this._contextObj = obj;
-                                this._loadComboData();
+                                if(!this.reloadDataViaAttribute || (this.reloadDataViaAttribute && this._contextObj.get(this.reloadDataViaAttribute) ) ){                    
+                                    this._loadComboData();
+                                }                                
                             })
                         });
 
@@ -550,9 +594,12 @@ define( [
                     callback: dojoLang.hitch(this, function (guid) {
                         mx.data.get({
                             guid: guid,
-                            callback: dojoLang.hitch(this, function (obj) {
+                            callback: dojoLang.hitch(this, function (obj) {                                
                                 this._contextObj = obj;
-                                this._loadComboData();
+
+                                if(!this._bypassDataRefresh){
+                                    this._loadComboData();
+                                }                           
                             })
                         });
                     })

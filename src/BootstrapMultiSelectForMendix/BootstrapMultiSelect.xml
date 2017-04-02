@@ -113,6 +113,14 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lD
                 </property>
             </properties>
         </property>
+        <property key="reloadDataViaAttribute" type="attribute" required="false">
+            <caption>Reload data via attribute</caption>
+            <category>Data source</category>
+            <description>Optional, controls whether the data is reloaded when the context object is refreshed (true = refresh, false = don't refresh)</description>
+            <attributeTypes>
+                <attributeType name="Boolean"/>
+            </attributeTypes>
+        </property>
         <property key="showLabel" type="boolean" defaultValue="true">
             <caption>Show Label</caption>
             <category>Display</category>
