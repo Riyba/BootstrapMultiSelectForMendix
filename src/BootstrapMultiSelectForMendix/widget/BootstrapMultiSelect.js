@@ -6,7 +6,7 @@
     @file      : BootstrapMultiSelect.js
     @version   : 2.0.0
     @author    : Iain Lindsay
-    @date      : 2017-03-29
+    @date      : 2017-04-12
     @copyright : AuraQ Limited 2016
     @license   : Apache v2
 
@@ -77,6 +77,7 @@ define( [
             this._entity = this.dataAssociation.split('/')[1];
             this._reference = this.dataAssociation.split('/')[0];        
             this._attributeList = this._variableContainer;
+            this._bypassDataRefresh = false;
 
             // issues with the sort parameters being persisted between widget instances mean we set the sort array to empty.
             this._sortParams = [];
@@ -147,23 +148,24 @@ define( [
                         // in the absence of an 'onDeselectAll' event we assume
                         // its the selectall checkbox if the option value is undefined                                      
                         if( option === undefined ) {
-                            var my$ = $;                                                        
+                            var guids = [];                                          
                             if (checked){
                                 // if there is a filter we need to pull back only the visible options, otherwise we'll update all items
                                 if(self.addFilter){
                                     var visibleOptions = self._getVisibleOptions();
                                     dojoArray.forEach(visibleOptions, function (availableObject, index) {                
                                         var guid = availableObject.value;
-
-                                        self._contextObj.addReference(self._reference, guid);
+                                        guids.push(guid);                                        
                                     });
+
+                                    self._contextObj.addReferences(self._reference, guids);
 
                                 } else{
                                     dojoArray.forEach(self._comboData, function (availableObject, index) {                
                                         var guid = availableObject.value;
-
-                                        self._contextObj.addReference(self._reference, guid);
+                                        guids.push(guid);                                        
                                     });
+                                    self._contextObj.addReferences(self._reference, guids);
                                 }                                
                             }
                             else{
@@ -172,17 +174,18 @@ define( [
                                     var visibleOptions = self._getVisibleOptions();
                                     dojoArray.forEach(visibleOptions, function (availableObject, index) {                
                                         var guid = availableObject.value;
-
-                                        self._contextObj.removeReferences(self._reference, [guid]);
+                                        guids.push(guid);
                                     });
+
+                                    self._contextObj.removeReferences(self._reference, guids);
                                 } else{
                                     dojoArray.forEach(self._comboData, function (availableObject, index) {                
                                         var guid = availableObject.value;
-
-                                        self._contextObj.removeReferences(self._reference, [guid]);
+                                        guids.push(guid);                                        
                                     });
+                                    self._contextObj.removeReferences(self._reference, guids);
                                 }
-                            }                            
+                            }
                         }
                         else {
                             var guid = $(option).val();
@@ -283,7 +286,7 @@ define( [
         },
         
         // retrieves the data from the child entity, applying the required constraint
-        _loadComboData: function () {            
+        _loadComboData: function () {   
             // Important to clear all validations!
             this._clearValidations();
             
@@ -506,28 +509,28 @@ define( [
         },
 
         // marks referenced objects as selected in the combo options.
-        _setReferencedObjects: function () {           
-            var self = this,
-                referencedObjects = self._contextObj.get(self._reference);
+        _setReferencedObjects: function () {      
+            if(!this._bypassDataRefresh){         
+                referencedObjects = this._contextObj.getReferences(this._reference);
             
-            if(referencedObjects !== null && referencedObjects !== "") {
-                dojoArray.forEach(self._comboData, function (availableObject, index) {                
-                    // reset to false first
-                    availableObject.selected = false;
-                    //check if this is a current tag
-                    dojoArray.forEach(referencedObjects, function (ref, i) {
-                        if (availableObject.value === ref) {
-                                availableObject.selected = true;
+                if(referencedObjects !== null && referencedObjects !== "") {
+                    dojoArray.forEach(this._comboData, function (availableObject, index) {                
+                        // reset to false first
+                        availableObject.selected = false;
+                        //check if this is a current tag
+                        if( referencedObjects.indexOf(availableObject.value) >= 0){
+                            availableObject.selected = true;
                         }
-                    }, self);
-                }, self);
-            }                    
-            
-            // update array and set selected flag based on referenced options                
-            self._$combo.multiselect('dataprovider', this._comboData);
 
-            // finally update the display
-            self._updateControlDisplay();
+                    }, this);
+                }                    
+                
+                // update array and set selected flag based on referenced options                
+                this._$combo.multiselect('dataprovider', this._comboData);
+
+                // finally update the display
+                this._updateControlDisplay();
+            }
         },
 
         _execMf: function (guid, mf, cb, showProgress, message) {
@@ -594,12 +597,8 @@ define( [
                     callback: dojoLang.hitch(this, function (guid) {
                         mx.data.get({
                             guid: guid,
-                            callback: dojoLang.hitch(this, function (obj) {                                
-                                this._contextObj = obj;
-
-                                if(!this._bypassDataRefresh){
-                                    this._loadComboData();
-                                }                           
+                            callback: dojoLang.hitch(this, function (obj) {    
+                                this._setReferencedObjects();                    
                             })
                         });
                     })
