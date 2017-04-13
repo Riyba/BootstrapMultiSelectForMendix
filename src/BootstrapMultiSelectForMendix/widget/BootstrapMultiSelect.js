@@ -511,7 +511,7 @@ define( [
         // marks referenced objects as selected in the combo options.
         _setReferencedObjects: function () {      
             if(!this._bypassDataRefresh){         
-                referencedObjects = this._contextObj.getReferences(this._reference);
+                var referencedObjects = this._contextObj.getReferences(this._reference);
             
                 if(referencedObjects !== null && referencedObjects !== "") {
                     dojoArray.forEach(this._comboData, function (availableObject, index) {                
