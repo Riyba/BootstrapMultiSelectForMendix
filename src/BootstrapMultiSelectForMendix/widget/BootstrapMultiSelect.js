@@ -291,7 +291,7 @@ define( [
             this._clearValidations();
             
             // reset our data
-            var xpath = '//' + this._entity + this.dataConstraint.replace('[%CurrentObject%]', this._contextObj.getGuid());
+            var xpath = '//' + this._entity + this.dataConstraint.replace(/\[\%CurrentObject\%\]/gi, this._contextObj.getGuid());
             mx.data.get({
                 xpath: xpath,
                 filter: {
