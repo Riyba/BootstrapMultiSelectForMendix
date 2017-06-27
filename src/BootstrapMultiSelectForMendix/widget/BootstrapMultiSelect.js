@@ -4,10 +4,10 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 2.0.0
+    @version   : 2.0.1
     @author    : Iain Lindsay
-    @date      : 2017-04-12
-    @copyright : AuraQ Limited 2016
+    @date      : 2017-06-27
+    @copyright : AuraQ Limited 2017
     @license   : Apache v2
 
     Documentation
