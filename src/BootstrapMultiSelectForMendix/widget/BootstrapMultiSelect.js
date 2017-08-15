@@ -4,9 +4,9 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 2.0.1
+    @version   : 3.0.0
     @author    : Iain Lindsay
-    @date      : 2017-06-27
+    @date      : 2017-08-15
     @copyright : AuraQ Limited 2017
     @license   : Apache v2
 
@@ -290,16 +290,26 @@ define( [
             // Important to clear all validations!
             this._clearValidations();
             
-            // reset our data
-            var xpath = '//' + this._entity + this.dataConstraint.replace(/\[\%CurrentObject\%\]/gi, this._contextObj.getGuid());
-            mx.data.get({
-                xpath: xpath,
-                filter: {
-                    sort: this._sortParams,
-                    offset: 0
-                },
-                callback: dojoLang.hitch(this, this._processComboData)
-            });
+            if(this.retrieveType === "xpath"){
+                // reset our data
+                var xpath = '//' + this._entity + this.dataConstraint.replace(/\[\%CurrentObject\%\]/gi, this._contextObj.getGuid());
+                mx.data.get({
+                    xpath: xpath,
+                    filter: {
+                        sort: this._sortParams,
+                        offset: 0
+                    },
+                    callback: dojoLang.hitch(this, this._processComboData)
+                });
+            }
+            else{
+                if( this.retrieveMicroflow ){                    
+                    this._execMf(this._contextObj.getGuid(), this.retrieveMicroflow, dojoLang.hitch(this, this._processComboData));  
+                }
+                else{
+                    logger.debug("No retrieve microflow specified");
+                }
+            }
         },
         
         // sets up the available combo options
@@ -534,6 +544,7 @@ define( [
         },
 
         _execMf: function (guid, mf, cb, showProgress, message) {
+            var self = this;
             if (guid && mf) {                
                 var options = {
                     params: {
@@ -541,9 +552,9 @@ define( [
                         actionname: mf,
                         guids: [guid]
                     },
-                    callback: function () {
+                    callback: function (objs) {
                         if (cb) {
-                            cb();
+                            cb(objs);
                         }
                     },
                     error: function (e) {

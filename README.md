@@ -13,11 +13,17 @@ Where you have a relatively small number of available options for a reference se
 # Configuration
 
 ## Data Source
+- **Retrieve type**: 'XPath' or 'Microflow'; controls whether the data is retrieved via an XPath query or a Microflow.
 - **Multi Select Source**: The reference set association, starting from the dataview object.
 - **Display Template**: The template (treated as Plain Text) to use for in the dropdown. 
 - **Template Attributes**: The mapping of attributes to variable names for replacement in 'Display Template'
+
+## Data Source - XPath
 - **Data constraint**: An XPath constraint, filtering the available objects that are displayed in the dropdown.
 - **Sort order**: The attributes that the results should be sorted by.
+
+## Data Source - Microflow
+- **Multi Select Source**: The reference set association, starting from the dataview object.
 
 ## Display
 - **Show Label**: Whether a label should be displayed for the dropdown.
