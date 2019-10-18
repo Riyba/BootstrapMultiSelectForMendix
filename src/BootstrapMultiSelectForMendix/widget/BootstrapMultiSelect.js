@@ -4,10 +4,10 @@
     ========================
 
     @file      : BootstrapMultiSelect.js
-    @version   : 3.0.0
+    @version   : 4.0.0
     @author    : Iain Lindsay
-    @date      : 2017-08-15
-    @copyright : AuraQ Limited 2017
+    @date      : 2019-10-17
+    @copyright : AuraQ Limited 2019
     @license   : Apache v2
 
     Documentation
@@ -36,11 +36,12 @@ define( [
     'dojo/html', 
     'dojo/_base/event',
     "dojo/_base/kernel",
+    "dojo/date/locale",
     'BootstrapMultiSelectForMendix/lib/jquery-1.11.2',
     'BootstrapMultiSelectForMendix/lib/bootstrap',
     'BootstrapMultiSelectForMendix/lib/bootstrap-multiselect',
     'dojo/text!BootstrapMultiSelectForMendix/widget/templates/BootstrapMultiSelect.html'
-], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domGeom, dojoClass, domStyle, domConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, dojo, _jQuery, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
+], function (declare, _WidgetBase, _TemplatedMixin, _AttachMixin, dom, dojoDom, domQuery, domProp, domGeom, dojoClass, domStyle, domConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, dojo, dojoLocale, _jQuery, _bootstrap, _bootstrapMultiSelect, widgetTemplate) {
     'use strict';
 
     var $ = _jQuery.noConflict(true);
@@ -104,6 +105,9 @@ define( [
                     
                     dojoClass.add(this.multiSelectLabel, comboLabelClass);
                     dojoClass.add(this.multiSelectComboContainer, comboControlClass);
+                }
+                else{
+                    dojoClass.add(this.multiSelectMainContainer, "no-columns");
                 }
 
                 this.multiSelectLabel.innerHTML = this.fieldCaption;
@@ -196,8 +200,6 @@ define( [
                                 self._contextObj.removeReferences(self._reference, [guid]);
                             }
                         }
-
-                        self._bypassDataRefresh = false;
                         
                         // run the OC microflow if one has been configured.                   
                         if( self.onChangeMicroflow ) {
@@ -244,21 +246,27 @@ define( [
         },
 
         _updateControlDisplay : function(){
-            // fixed property gets checked first
-            if(this.disabled){
+            // if data view is disabled
+            if(this.get("disabled")) {
                 this._$combo.multiselect('disable');
-                
-            } else{
-                this._$combo.multiselect('enable');
             }
-            // attribute property beats fixed property    
-            if(this.disabledViaAttribute){
-                if(this._contextObj.get(this.disabledViaAttribute) ){
+            else {
+                    // fixed property gets checked first
+                if(this.disabled){
                     this._$combo.multiselect('disable');
+                    
                 } else{
                     this._$combo.multiselect('enable');
                 }
-            } 
+                // attribute property beats fixed property    
+                if(this.disabledViaAttribute){
+                    if(this._contextObj.get(this.disabledViaAttribute) ){
+                        this._$combo.multiselect('disable');
+                    } else{
+                        this._$combo.multiselect('enable');
+                    }
+                } 
+            }
 
             // fixed property gets checked first
             if(this.visible){
@@ -388,7 +396,7 @@ define( [
                 returnvalue = this._parseDate(this._attributeList[i].datetimeformat, options, obj.get(attr));
             } else if (obj.isEnum(attr)) {
                 returnvalue = this._checkString(obj.getEnumCaption(attr, obj.get(attr)), escapeValues);
-            }  else if (obj.isNumeric(attr) || obj.isCurrency(attr) || obj.getAttributeType(attr) === "AutoNumber") {
+            }  else if (obj.isNumeric(attr) || ( obj.isCurrency && obj.isCurrency(attr) ) || obj.getAttributeType(attr) === "AutoNumber") {
                 numberOptions = {};
                 numberOptions.places = this._attributeList[i].decimalPrecision;
                 if (this._attributeList[i].groupDigits) {
@@ -498,7 +506,7 @@ define( [
             }
 
             options.selector = format;
-            datevalue = dojo.date.locale.format(new Date(value), options);
+            datevalue = dojoLocale.format(new Date(value), options);
 
             return datevalue;
         },
@@ -541,6 +549,9 @@ define( [
                 // finally update the display
                 this._updateControlDisplay();
             }
+            else{
+                this._bypassDataRefresh = false;
+            }            
         },
 
         _execMf: function (guid, mf, cb, showProgress, message) {

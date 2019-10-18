@@ -28,10 +28,10 @@ button.multiselect .caret {
 }
 
 .multiselect-container {
-    position: absolute;
-    list-style-type: none;
-    margin: 0;
-    padding: 0
+    position: absolute !important;
+    list-style-type: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .multiselect-container .input-group {
@@ -39,7 +39,8 @@ button.multiselect .caret {
 }
 
 .multiselect-container>li {
-    padding: 0
+    padding: 0 !important;
+    border: 0 !important;
 }
 
 .multiselect-container>li>a.multiselect-all label {
@@ -58,7 +59,7 @@ button.multiselect .caret {
 }
 
 .multiselect-container>li>a {
-    padding: 0
+    padding: 0 !important;
 }
 
 .multiselect-container>li>a>label {
@@ -92,4 +93,8 @@ button.multiselect .caret {
 .form-inline .multiselect-container li a label.radio input[type=radio] {
     margin-left: -20px;
     margin-right: 0
+}
+
+.multiselect-selected-text{
+    width: 100%;
 }

@@ -1,4 +1,4 @@
-// Generated on 2017-01-12 using generator-mendix 2.0.1 :: git+https://github.com/mendix/generator-mendix.git
+// Generated on 2016-03-31 using generator-mendix 1.3.3 :: git+https://github.com/mendix/generator-mendix.git
 /*jshint -W069*/
 /*global module*/
 "use strict";
@@ -23,14 +23,17 @@ var path = require("path"),
         xmldec:     { standalone: null, encoding: "utf-8" }
     }),
     shelljs = require("shelljs"),
-    pkg = require("./package.json"),
-    currentFolder = shelljs.pwd().toString();
+    pkg = require("./package.json");
 
-var TEST_PATH = path.join(currentFolder, "/test/Test.mpr");
-var WIDGET_XML = path.join(currentFolder, "/src/", pkg.name, "/", pkg.name + ".xml");
-var PACKAGE_XML = path.join(currentFolder, "/src/package.xml");
-var TEST_WIDGETS_FOLDER = path.join(currentFolder, "./test/widgets");
-var TEST_WIDGETS_DEPLOYMENT_FOLDER = path.join(currentFolder, "./test/deployment/web/widgets");
+
+var WIDGET_XML = path.join(shelljs.pwd(), "/src/", pkg.name, "/", pkg.name + ".xml");
+var PACKAGE_XML = path.join(shelljs.pwd(), "/src/package.xml");
+var TEST_PATH = path.join(shelljs.pwd(), "/test/Test.mpr");
+var TEST_WIDGETS_FOLDER = path.join(shelljs.pwd(), "./test/widgets");
+var TEST_WIDGETS_DEPLOYMENT_FOLDER = path.join(shelljs.pwd(), "./test/deployment/web/widgets");
+var TEST_8_PATH = path.join(shelljs.pwd(), "/test 8/Test.mpr");
+var TEST_8_WIDGETS_FOLDER = path.join(shelljs.pwd(), "./test 8/widgets");
+var TEST_8_WIDGETS_DEPLOYMENT_FOLDER = path.join(shelljs.pwd(), "./test 8/deployment/web/widgets");
 
 /**
  * If you want to use a custom folder for the test project, make sure these are added to package.json:
@@ -44,7 +47,7 @@ var TEST_WIDGETS_DEPLOYMENT_FOLDER = path.join(currentFolder, "./test/deployment
 if (pkg.paths && pkg.paths.testProjectFolder && pkg.paths.testProjectFileName) {
     var folder = pkg.paths.testProjectFolder;
     if (folder.indexOf(".") === 0) {
-        folder = path.join(currentFolder, folder);
+        folder = path.join(shelljs.pwd(), folder);
     }
     TEST_PATH = path.join(folder, pkg.paths.testProjectFileName);
     TEST_WIDGETS_FOLDER = path.join(folder, "/widgets");
@@ -81,27 +84,21 @@ module.exports = function (grunt) {
         copy: {
             deployment: {
                 files: [
-                    { dest: TEST_WIDGETS_DEPLOYMENT_FOLDER, cwd: "./src/", src: ["**/*"], expand: true }
+                    { dest: TEST_WIDGETS_DEPLOYMENT_FOLDER, cwd: "./src/", src: ["**/*"], expand: true },
+                    { dest: TEST_8_WIDGETS_DEPLOYMENT_FOLDER, cwd: "./src/", src: ["**/*"], expand: true }
                 ]
             },
             mpks: {
                 files: [
-                    { dest: TEST_WIDGETS_FOLDER, cwd: "./dist/", src: [ pkg.name + ".mpk"], expand: true }
+                    { dest: TEST_WIDGETS_FOLDER, cwd: "./dist/", src: [ pkg.name + ".mpk"], expand: true },
+                    { dest: TEST_8_WIDGETS_FOLDER, cwd: "./dist/", src: [ pkg.name + ".mpk"], expand: true }
                 ]
             }
         },
         clean: {
             build: [
-                path.join(currentFolder, "dist", pkg.name, "/*")
+                path.join(shelljs.pwd(), "dist", pkg.name, "/*")
             ]
-        },
-        csslint: {
-            strict: {
-              options: {
-                import: 2
-              },
-              src: ["src/" + pkg.name + "/widget/ui/*.css"]
-            }
         }
     });
 
@@ -110,7 +107,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-newer");
-    grunt.loadNpmTasks("grunt-contrib-csslint");
 
     grunt.registerTask("start-modeler", function () {
         var done = this.async();
@@ -170,7 +166,7 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask("generate-icon", function () {
-        var iconPath = path.join(currentFolder, "/icon.png"),
+        var iconPath = path.join(shelljs.pwd(), "/icon.png"),
             options = {localFile: true, string: true},
             done = this.async();
 

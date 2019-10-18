@@ -1,4 +1,6 @@
-test/javasource/
+test/javasource/*
+!test/javasource/testsuite_default
+test/javasource/testsuite_default/proxies/*
 test/deployment/
 test/.classpath
 test/.project
@@ -6,6 +8,17 @@ test/theme/
 test/userlib/
 test/.classpath
 test/.project
+
+test 8/javasource/*
+!test 8/javasource/testsuite_default
+test 8/javasource/testsuite_default/proxies/*
+test 8/deployment/
+test 8/.classpath
+test 8/.project
+test 8/userlib/
+test 8/.classpath
+test 8/.project
+
 *.launch
 *.tmp
 *.lock
@@ -18,3 +31,4 @@ node_modules/
 *DS_Store*
 .vscode/
 *.bak
+
